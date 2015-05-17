@@ -32,6 +32,27 @@ resource "aws_subnet" "private-a" {
   }
 }
 
+resource "aws_subnet" "public-c" {
+  availability_zone = "ap-northeast-1c"
+  vpc_id = "${aws_vpc.main.id}"
+  cidr_block = "10.1.51.0/24"
+  map_public_ip_on_launch = true
+
+  tags {
+    Name = "WP-PublicSubnet-C"
+  }
+}
+
+resource "aws_subnet" "private-c" {
+  availability_zone = "ap-northeast-1c"
+  vpc_id = "${aws_vpc.main.id}"
+  cidr_block = "10.1.55.0/24"
+
+  tags {
+    Name = "WP-PrivateSubnet-C"
+  }
+}
+
 resource "aws_internet_gateway" "gw" {
   vpc_id = "${aws_vpc.main.id}"
 
@@ -78,3 +99,48 @@ resource "aws_security_group" "db" {
   }
 }
  
+resource "aws_security_group_rule" "ssh" {
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.app.id}"
+}
+
+resource "aws_security_group_rule" "web" {
+  type = "ingress"
+  from_port = 80 
+  to_port = 80
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.app.id}"
+}
+
+resource "aws_security_group_rule" "all" {
+  type = "egress"
+  from_port = 0
+  to_port = 65535
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.app.id}"
+}
+
+resource "aws_security_group_rule" "db" {
+  type = "ingress"
+  from_port = 3306
+  to_port = 3306
+  protocol = "tcp"
+  source_security_group_id = "${aws_security_group.app.id}"
+
+  security_group_id = "${aws_security_group.db.id}"
+}
+
+resource "aws_db_subnet_group" "main" {
+  name = "wp-dbsubnet"
+  description = "WordPress DB Subnet"
+  subnet_ids = ["${aws_subnet.private-a.id}", "${aws_subnet.private-c.id}"]
+}
