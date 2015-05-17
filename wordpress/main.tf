@@ -158,3 +158,15 @@ resource "aws_db_instance" "default" {
   vpc_security_group_ids = ["${aws_security_group.db.id}"]
   db_subnet_group_name = "${aws_db_subnet_group.main.name}"
 }
+
+resource "aws_instance" "web" {
+  ami = "${var.ami}"
+  instance_type = "t2.micro"
+  subnet_id = "${aws_subnet.public-a.id}"
+  associate_public_ip_address = true
+  vpc_security_group_ids = ["${aws_security_group.app.id}"]
+  key_name = "${var.key_name}"
+  tags {
+    Name = "WP-WebAPP"
+  }
+}
