@@ -144,3 +144,17 @@ resource "aws_db_subnet_group" "main" {
   description = "WordPress DB Subnet"
   subnet_ids = ["${aws_subnet.private-a.id}", "${aws_subnet.private-c.id}"]
 }
+
+resource "aws_db_instance" "default" {
+  identifier = "wp-mysql"
+  allocated_storage = 5
+  engine = "mysql"
+  engine_version = "5.6.22"
+  instance_class = "db.t2.micro"
+  # general purpose SSD
+  storage_type = "gp2"
+  username = "${var.db_name}"
+  password = "${var.db_password}"
+  vpc_security_group_ids = ["${aws_security_group.db.id}"]
+  db_subnet_group_name = "${aws_db_subnet_group.main.name}"
+}
