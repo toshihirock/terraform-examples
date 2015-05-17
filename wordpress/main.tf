@@ -57,3 +57,24 @@ resource "aws_main_route_table_association" "a" {
     vpc_id = "${aws_vpc.main.id}"
     route_table_id = "${aws_route_table.r.id}"
 }
+
+resource "aws_security_group" "app" {
+  name = "WP-Web-DMZ"
+  description = "WordPress Web APP Security Group"
+  vpc_id = "${aws_vpc.main.id}"
+
+  tags {
+    Name = "WP-Web-DMZ"
+  }
+}
+
+resource "aws_security_group" "db" {
+  name = "WP-DB"
+  description = "WordPress MySQL Security Group"
+  vpc_id = "${aws_vpc.main.id}"
+
+  tags {
+    Name = "WP-DB"
+  }
+}
+ 
