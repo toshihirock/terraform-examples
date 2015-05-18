@@ -22,6 +22,16 @@ resource "aws_instance" "web" {
   ami = "${var.ami}"
   key_name = "${var.key_name}"
   security_groups = ["Web"]
+
+  provisioner "file" {
+    source = "prepareWordPress.sql"
+    destination = "/home/ec2-user/prepareWordPress.sql"
+    connection {
+      user = "ec2-user"
+      key_file = "${var.ssh_key_file}"
+    }
+  }
+
   provisioner "remote-exec" {
     inline = [
     "sudo yum install php php-mysql php-gd php-mbstring -y",
@@ -34,7 +44,8 @@ resource "aws_instance" "web" {
     "sudo killall -9 httpd",
     "sudo rm -f /var/lock/subsys/httpd",
     "sudo service httpd start",
-    "sudo service httpd status"
+    "sudo service httpd status",
+    "mysql -u root -p${var.db_password} -h ${aws_db_instance.default.address} < /home/ec2-user/prepareWordPress.sql"
     ]
     connection {
       user = "ec2-user"
