@@ -10,7 +10,7 @@ resource "aws_db_instance" "default" {
   instance_class = "db.t2.micro"
   # general purpose SSD
   storage_type = "gp2"
-  username = "${var.db_name}"
+  username = "${var.db_username}"
   password = "${var.db_password}"
   backup_retention_period = 0
   vpc_security_group_ids = ["${var.db_security_group_id}"]

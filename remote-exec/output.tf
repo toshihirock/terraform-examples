@@ -1,5 +1,5 @@
 output "wordpress-endpoint" {
-  value = "${aws_instance.web.public_dns}"
+  value = "http://${aws_instance.web.public_dns}/wordpress/wp-admin/install.php"
 }
 
 output "web-ip" {
